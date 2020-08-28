@@ -6,7 +6,7 @@ mpp.connect()
 
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setChannel('𝒲𝑒𝓁𝒸𝑜𝓂𝑒 𝓉𝑜 𝓉𝒽𝑒 🦉 ๖ۣۜ 𝐨𝓌𝓁 ♪ 🎹𝕽𝖔𝖔𝖒✞')
+  mpp.setChannel('My r32432oom')
     .then(() => console.log('Channel set, users: ' + mpp.room.users.length))
 })
 
