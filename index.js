@@ -187,7 +187,6 @@ class Client extends EventEmitter {
     this.ws.addEventListener('close', evt => {
       clearInterval(this.heartbeatInterval)
       if (!this.hasErrored) this.emit('disconnected')
-      this._resetClient()
     })
 
     /* Handles our errors */
