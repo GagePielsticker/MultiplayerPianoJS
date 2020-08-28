@@ -1,6 +1,6 @@
 {
   "name": "multiplayerpianojs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP.",
   "main": "index.js",
   "repository": {
@@ -19,7 +19,12 @@
     "client",
     "mpp",
     "client",
-    "xt"
+    "xt",
+    "mpp.js",
+    "multiplayerpiano.js",
+    "library",
+    "bot",
+    "piano"
   ],
   "dependencies": {
     "https-proxy-agent": "^5.0.0",
