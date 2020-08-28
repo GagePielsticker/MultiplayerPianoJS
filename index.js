@@ -193,6 +193,7 @@ class Client extends EventEmitter {
     this.ws.addEventListener('error', error => {
       if (error.message === 'WebSocket was closed before the connection was established') return
       this.emit('error', new Error(error))
+      this.ws.close()
     })
 
     /* Handles generic messages */
