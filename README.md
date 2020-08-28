@@ -20,7 +20,7 @@ mpp.connect()
 
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setChannel('my room✞')
+  mpp.setChannel('my room')
     .then(() => console.log('Channel Set!'))
 })
 
