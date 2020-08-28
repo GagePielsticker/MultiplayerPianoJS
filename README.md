@@ -8,6 +8,7 @@
 
 ## Installation
 **Node.js 12.0.0 or newer is required.**
+
 `npm install multiplayerpianojs`
 
 # Example Usage
