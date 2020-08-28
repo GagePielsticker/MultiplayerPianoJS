@@ -47,55 +47,77 @@ mpp.on('userLeave', user => {
 ## Methods/Functions
 
 - **connect()**
+
 _Connects bot to the WS_
 
 - **disconnect()**
+
 _Disconnects bot to the WS_
 
 - **setChannel(String name)**
+
 _Sets the current channel_
+
 Returns: `Promise`
 
 - **sendMessage(String message)**
+
 _Sends message in channel_
+
 Returns: `Promise`
 
 - **setName(String name)**
+
 _Sets the current name_
+
 Returns: `Promise`
 
 - **moveMouse(Int x, Int y)**
+
 _Moves mouse position_
+
 Returns: `Promise`
 
 ## Events
 - **connected**
+
 _Fired on bot connection to websocket_
 
 - **disconnected**
+
 _Fired on bot disconnect to websocket_
 
 - **userJoin**
+
 _Fired on user join_
+
 Callback: `Object`
 
 - **userLeave**
+
 _Fired on user leave_
+
 Callback: `Object`
 
 - **error**
+
 _Fired on error_
+
 Callback: `String`
 
 - **Message**
+
 _Fired on message recieve_
+
 Callback: `Message Object`
 
 ## Properties
 - **room**
+
 _Object containing all users in room + room name_
 
 - **proxy**
+
 _Currently connected proxy_
 
 ## Dependencies
