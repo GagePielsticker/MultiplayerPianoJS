@@ -1,4 +1,4 @@
-const Client = require('./index')
+const Client = require('../index')
 
 const mpp = new Client()
 
@@ -31,5 +31,11 @@ mpp.on('error', e => {
 mpp.on('message', msg => {
   if (msg.content === '!ping') {
     mpp.sendMessage('Pong!')
+  }
+  if (msg.content === 'kickme') {
+    mpp.kickUser(msg.user.id)
+  }
+  if (msg.content === 'givemecrown') {
+    mpp.giveCrown(msg.user.id)
   }
 })

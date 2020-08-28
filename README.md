@@ -27,12 +27,19 @@ mpp.on('connected', () => {
     .then(() => console.log('Channel Set!'))
 })
 
+// These are chat messages
 mpp.on('message', msg => {
   if (msg.content === '!ping') {
     mpp.sendMessage('Pong!')
   }
   if (msg.content === '!disconnect') {
     mpp.disconnect()
+  }
+  if (msg.content === '!kickme') {
+    mpp.kickUser(msg.user.id)
+  }
+  if (msg.content === '!givemecrown') {
+    mpp.giveCrown(msg.user.id)
   }
 })
 
@@ -77,6 +84,18 @@ Returns: `Promise`
 - **moveMouse(Int x, Int y)**
 
 _Moves mouse position_
+
+Returns: `Promise`
+
+- **kickUser(String userID)**
+
+_Kicks user from room, must be owner_
+
+Returns: `Promise`
+
+- **giveCrown(String userID)**
+
+_Gives crown to specific user, must be owner_
 
 Returns: `Promise`
 

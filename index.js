@@ -114,6 +114,36 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Kicks user id from room
+   * @param {String} id
+   */
+  kickUser (id) {
+    return new Promise((resolve, reject) => {
+      try {
+        this._sendArray([{ m: 'kickban', id, undefined }])
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  /**
+   * Gives crown to a specific user
+   * @param {String} id
+   */
+  giveCrown (id) {
+    return new Promise((resolve, reject) => {
+      try {
+        this.sendArray([{ m: 'chown', id }])
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  /**
    * Closes the websocket
    */
   disconnect () {
