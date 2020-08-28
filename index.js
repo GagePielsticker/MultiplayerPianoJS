@@ -125,7 +125,7 @@ class Client extends EventEmitter {
   kickUser (id) {
     return new Promise((resolve, reject) => {
       try {
-        this._sendArray([{ m: 'kickban', id, undefined }])
+        this._sendArray([{ m: 'kickban', _id: id, ms: 1 }])
         resolve()
       } catch (e) {
         reject(e)
