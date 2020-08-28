@@ -1,7 +1,7 @@
 ![Express API Boilerplate](https://i.imgur.com/tEXHZfc.png)
 #
 
-[![Known Vulnerabilities](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS/badge.svg?targetFile=package.json)](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS?targetFile=package.json) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/GagePielsticker/Express-API-Boilerplate/blob/master/LICENSE.md) ![GitHub last commit](https://img.shields.io/github/last-commit/gagepielsticker/Express-API-Boilerplate)
+[![Known Vulnerabilities](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS/badge.svg?targetFile=package.json)](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS?targetFile=package.json) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/GagePielsticker/Express-API-Boilerplate/blob/master/LICENSE.md) ![GitHub last commit](https://img.shields.io/github/last-commit/gagepielsticker/Express-API-Boilerplate) ![David](https://img.shields.io/david/GagePielsticker/MultiplayerPianoJS)
 
 ## Foreword
 
