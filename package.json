@@ -1,6 +1,6 @@
 {
   "name": "multiplayerpianojs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP.",
   "main": "index.js",
   "repository": {
