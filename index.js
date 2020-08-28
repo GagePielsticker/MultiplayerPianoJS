@@ -10,9 +10,7 @@ class Client extends EventEmitter {
     this.proxy = proxy
     this.ws = undefined
     this.heartbeatInterval = undefined
-    this.heartBeatIntervalMS = 20000
     this.isConnected = false
-    this.websocketTimeout = 10000
     this.room = {
       name: undefined,
       users: []
@@ -36,10 +34,10 @@ class Client extends EventEmitter {
 
     setTimeout(() => {
       if (!this.isConnected) {
-        this.emit('error', new Error('Bot failed to connect to websocket.'))
+        this.emit('error', new Error('Bot failed to connect to websocket in 10 seconds.'))
         this.ws.close()
       }
-    }, this.websocketTimeout)
+    }, 10000)
   }
 
   /**
@@ -150,7 +148,7 @@ class Client extends EventEmitter {
       this._sendArray([{ m: 'hi' }])
       this.heartbeatInterval = setInterval(() => {
         this._sendArray([{ m: 't', e: Date.now() }])
-      }, this.heartBeatIntervalMS)
+      }, 20000)
       this.emit('connected')
       this.setChannel('lobby')
     })

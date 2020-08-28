@@ -1,7 +1,7 @@
 {
   "name": "multiplayerpianojs",
-  "version": "1.0.6",
-  "description": "A promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP.",
+  "version": "1.0.8",
+  "description": "An easy to use promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP or Multiplayer Piano.",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
   "homepage": "https://github.com/GagePielsticker/MultiplayerPianoJS#readme",
   "keywords": [
     "MPP",
+    "easy",
     "multiplayerpiano",
     "client",
     "mpp",
@@ -26,7 +27,9 @@
     "bot",
     "piano",
     "proxy",
-    "client"
+    "client",
+    "multiplayer piano",
+    "multiplayer"
   ],
   "dependencies": {
     "https-proxy-agent": "^5.0.0",
