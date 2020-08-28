@@ -1,17 +1,32 @@
-const Client = require('../index')
-
-const mpp = new Client()
-
+const MPPClient = require('../index')
+const mpp = new MPPClient()
+// const mpp = new MPPClient(SCOCKS/HTTPS PROXY HERE) alternatively
 mpp.connect()
 
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setChannel('My r32432oom')
-    .then(() => console.log('Channel set, users: ' + mpp.room.users.length))
+  mpp.setName('Mr Roboto')
+  mpp.setChannel('my room')
+    .then(() => console.log('Channel Set!'))
 })
 
-mpp.on('disconnected', () => {
-  console.log('bot disconnected')
+// These are chat messages
+mpp.on('message', msg => {
+  if (msg.content === '!ping') {
+    mpp.sendMessage('Pong!')
+  }
+  if (msg.content === '!disconnect') {
+    mpp.disconnect()
+  }
+  if (msg.content === '!kickme') {
+    mpp.kickUser(msg.user.id)
+  }
+  if (msg.content === '!givemecrown') {
+    mpp.giveCrown(msg.user.id)
+  }
+  if (msg.content === '!allrooms') {
+    console.log(mpp.rooms)
+  }
 })
 
 mpp.on('userJoin', user => {
@@ -22,20 +37,4 @@ mpp.on('userJoin', user => {
 mpp.on('userLeave', user => {
   console.log(`user left: ${user.name}`)
   mpp.sendMessage(`Goodbye ${user.name}`)
-})
-
-mpp.on('error', e => {
-  console.log(e)
-})
-
-mpp.on('message', msg => {
-  if (msg.content === '!ping') {
-    mpp.sendMessage('Pong!')
-  }
-  if (msg.content === 'kickme') {
-    mpp.kickUser(msg.user.id)
-  }
-  if (msg.content === 'givemecrown') {
-    mpp.giveCrown(msg.user.id)
-  }
 })

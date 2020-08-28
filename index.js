@@ -11,6 +11,7 @@ class Client extends EventEmitter {
     this.ws = undefined
     this.heartbeatInterval = undefined
     this.isConnected = false
+    this.rooms = []
     this.room = {
       name: undefined,
       users: []
@@ -174,6 +175,9 @@ class Client extends EventEmitter {
   _constructSocketListeners () {
     /* Handles our open event */
     this.ws.addEventListener('open', evt => {
+      setInterval(() => {
+        this._sendArray([{ m: '+ls' }])
+      }, 2000)
       this.isConnected = true
       this._sendArray([{ m: 'hi' }])
       this.heartbeatInterval = setInterval(() => {
@@ -239,6 +243,16 @@ class Client extends EventEmitter {
             const user = this.room.users.filter(e => e.id === msg.p)[0]
             this.room.users = this.room.users.filter(e => e.id !== msg.p)
             this.emit('userLeave', user)
+          }
+          if (msg.m === 'ls') {
+            this.rooms = []
+            msg.u.forEach(room => {
+              this.rooms.push({
+                name: room._id,
+                count: room.count
+              })
+            })
+            this._sendArray([{ m: '-ls' }])
           }
         }
       } catch (error) {

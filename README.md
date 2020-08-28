@@ -41,6 +41,9 @@ mpp.on('message', msg => {
   if (msg.content === '!givemecrown') {
     mpp.giveCrown(msg.user.id)
   }
+  if (msg.content === '!allrooms') {
+    console.log(mpp.rooms)
+  }
 })
 
 mpp.on('userJoin', user => {
@@ -136,6 +139,10 @@ Callback: `Message Object`
 - **room**
 
 _Object containing all users in room + room name_
+
+- **rooms**
+
+_Array of all the rooms and their counts_
 
 - **proxy**
 
