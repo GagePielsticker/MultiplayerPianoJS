@@ -137,7 +137,7 @@ Callback: `String`
 
 - **Message**
 
-_Fired on message recieve_
+_Fired on chat message recieve_
 
 Callback: `Message Object`
 
