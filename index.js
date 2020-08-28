@@ -248,6 +248,7 @@ class Client extends EventEmitter {
             this.room.users = this.room.users.filter(e => e.id !== msg.p)
             this.emit('userLeave', user)
           }
+
           if (msg.m === 'ls') {
             this.rooms = []
             msg.u.forEach(room => {
@@ -257,6 +258,13 @@ class Client extends EventEmitter {
               })
             })
             this._sendArray([{ m: '-ls' }])
+          }
+
+          if (msg.m === 'n') {
+            this.emit('notePress', {
+              note: msg.n,
+              user: msg.p
+            })
           }
         }
       } catch (error) {

@@ -38,3 +38,7 @@ mpp.on('userLeave', user => {
   console.log(`user left: ${user.name}`)
   mpp.sendMessage(`Goodbye ${user.name}`)
 })
+
+mpp.on('notePress', note => {
+  console.log(note)
+})

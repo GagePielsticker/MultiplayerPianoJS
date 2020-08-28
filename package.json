@@ -1,6 +1,6 @@
 {
   "name": "multiplayerpianojs",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "An easy to use promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP to create chat bots.",
   "main": "index.js",
   "repository": {

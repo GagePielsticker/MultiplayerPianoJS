@@ -13,7 +13,7 @@
 `npm install multiplayerpianojs`
 
 # Example Usage
-More seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/bot.js)
+More seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
 ```js
 const MPPClient = require('multiplayerpianojs')
 const mpp = new MPPClient()
@@ -120,6 +120,12 @@ Callback: `Object`
 - **userLeave**
 
 _Fired on user leave_
+
+Callback: `Object`
+
+- **notePress**
+
+_Fired on note press_
 
 Callback: `Object`
 
