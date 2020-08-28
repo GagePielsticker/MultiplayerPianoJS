@@ -8,15 +8,19 @@ class Client extends EventEmitter {
     super()
     this.uri = 'wss://www.multiplayerpiano.com'
     this.proxy = proxy
-    this.ws = undefined
-    this.heartbeatInterval = undefined
-    this.isConnected = false
     this.rooms = []
     this.room = {
       name: undefined,
       users: []
     }
-    this.channelHasJoined = false
+
+    this._ws = undefined
+    this._heartbeatInterval = undefined
+    this._isConnected = false
+    this._channelHasJoined = false
+    this._socketTimeoutMS = 10000
+    this._heartbeatMS = 20000
+    this._roomScanMS = 2000
   }
 
   /* The following is client functions */
@@ -26,7 +30,7 @@ class Client extends EventEmitter {
    */
   connect () {
     /* Connect our websocket */
-    this.ws = new WebSocket(this.uri, {
+    this._ws = new WebSocket(this.uri, {
       origin: 'https://www.multiplayerpiano.com',
       agent: this.proxy ? this.proxy.startsWith('socks') ? new SocksProxyAgent(this.proxy) : new HttpsProxyAgent(this.proxy) : undefined
     })
@@ -34,11 +38,11 @@ class Client extends EventEmitter {
     this._constructSocketListeners()
 
     setTimeout(() => {
-      if (!this.isConnected) {
+      if (!this._isConnected) {
         this.emit('error', new Error('Bot failed to connect to websocket in 10 seconds.'))
-        this.ws.close()
+        this._ws.close()
       }
-    }, 10000)
+    }, this._socketTimeoutMS)
   }
 
   /**
@@ -55,9 +59,9 @@ class Client extends EventEmitter {
       this._sendArray([{ m: 'ch', _id: name, set: undefined }])
 
       const checker = setInterval(() => {
-        if (this.channelHasJoined) {
+        if (this._channelHasJoined) {
           resolve()
-          this.channelHasJoined = false
+          this._channelHasJoined = false
           clearInterval(checker)
         }
       }, 100)
@@ -148,7 +152,7 @@ class Client extends EventEmitter {
    * Closes the websocket
    */
   disconnect () {
-    this.ws.close()
+    this._ws.close()
   }
 
   /* The following is internal use functions not necessarily used for the client */
@@ -158,7 +162,7 @@ class Client extends EventEmitter {
    * @param {Websocket Data} data
    */
   _sendSocket (data) {
-    return this.ws.send(data)
+    return this._ws.send(data)
   }
 
   /**
@@ -174,34 +178,34 @@ class Client extends EventEmitter {
    */
   _constructSocketListeners () {
     /* Handles our open event */
-    this.ws.addEventListener('open', evt => {
+    this._ws.addEventListener('open', evt => {
       setInterval(() => {
         this._sendArray([{ m: '+ls' }])
-      }, 2000)
-      this.isConnected = true
+      }, this._roomScanMS)
+      this._isConnected = true
       this._sendArray([{ m: 'hi' }])
-      this.heartbeatInterval = setInterval(() => {
+      this._heartbeatInterval = setInterval(() => {
         this._sendArray([{ m: 't', e: Date.now() }])
-      }, 20000)
+      }, this._heartbeatMS)
       this.emit('connected')
       this.setChannel('lobby')
     })
 
     /* Handles our close event */
-    this.ws.addEventListener('close', evt => {
-      clearInterval(this.heartbeatInterval)
+    this._ws.addEventListener('close', evt => {
+      clearInterval(this._heartbeatInterval)
       if (!this.hasErrored) this.emit('disconnected')
     })
 
     /* Handles our errors */
-    this.ws.addEventListener('error', error => {
+    this._ws.addEventListener('error', error => {
       if (error.message === 'WebSocket was closed before the connection was established') return
       this.emit('error', new Error(error))
-      this.ws.close()
+      this._ws.close()
     })
 
     /* Handles generic messages */
-    this.ws.addEventListener('message', evt => {
+    this._ws.addEventListener('message', evt => {
       if (typeof evt.data !== 'string') return
       try {
         const transmission = JSON.parse(evt.data)
@@ -220,7 +224,7 @@ class Client extends EventEmitter {
           }
           if (msg.m === 'ch') {
             this.room.name = msg.ch._id
-            this.channelHasJoined = true
+            this._channelHasJoined = true
             if (this.room.users.length !== 0) return
             msg.ppl.forEach(person => {
               this.room.users.push({
