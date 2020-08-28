@@ -1,0 +1,29 @@
+{
+  "name": "multiplayerpianojs",
+  "version": "1.0.0",
+  "description": "A javascript library for multiplayerpiano.com (mpp).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GagePielsticker/MultiplayerPianoJS.git"
+  },
+  "author": "Gage Pielsticker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GagePielsticker/MultiplayerPianoJS/issues"
+  },
+  "homepage": "https://github.com/GagePielsticker/MultiplayerPianoJS#readme",
+  "keywords": [
+    "MPP",
+    "multiplayerpiano",
+    "client",
+    "mpp",
+    "client",
+    "xt"
+  ],
+  "dependencies": {
+    "https-proxy-agent": "^5.0.0",
+    "socks-proxy-agent": "^5.0.0",
+    "ws": "^7.3.1"
+  }
+}
