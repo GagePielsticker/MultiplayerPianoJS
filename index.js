@@ -16,11 +16,19 @@ class Client extends EventEmitter {
 
     this._ws = undefined
     this._heartbeatInterval = undefined
+
     this._isConnected = false
     this._channelHasJoined = false
+
     this._socketTimeoutMS = 10000
     this._heartbeatMS = 20000
     this._roomScanMS = 2000
+    this._noteBufferTime = 0
+    this._noteFlushIntervalMS = 200
+    this._serverTimeOffset = 0
+
+    this._noteBuffer = []
+    this._noteFlushInterval = undefined
   }
 
   /* The following is client functions */
@@ -155,6 +163,50 @@ class Client extends EventEmitter {
     this._ws.close()
   }
 
+  /**
+   * Starts a note with a specific velocity
+   * @param {String} note
+   * @param {Integer} vel
+   */
+  startNote (note, vel) {
+    return new Promise((resolve, reject) => {
+      try {
+        vel = typeof vel === 'undefined' ? undefined : +vel.toFixed(3)
+        if (!this._noteBufferTime) {
+          this._noteBufferTime = Date.now()
+          this._noteBuffer.push({ n: note, v: vel })
+          resolve()
+        } else {
+          this._noteBuffer.push({ d: Date.now() - this.noteBufferTime, n: note, v: vel })
+          resolve()
+        }
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  /**
+   * Will stop a note from playing
+   * @param {String} note
+   */
+  stopNote (note) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this._noteBufferTime) {
+          this._noteBufferTime = Date.now()
+          this._noteBuffer.push({ n: note, s: 1 })
+          resolve()
+        } else {
+          this._noteBuffer.push({ d: Date.now() - this._noteBufferTime, n: note, s: 1 })
+          resolve()
+        }
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
   /* The following is internal use functions not necessarily used for the client */
 
   /**
@@ -174,6 +226,28 @@ class Client extends EventEmitter {
   }
 
   /**
+   * Recieves and calculates server offset
+   * @param {time} time
+   */
+  _recieveServerTime (time) {
+    const now = Date.now()
+    const target = time - now
+    const duration = 1000
+    let step = 0
+    const steps = 50
+    const stepMS = duration / steps
+    const difference = target - this._serverTimeOffset
+    const inc = difference / steps
+    const iv = setInterval(() => {
+      this._serverTimeOffset += inc
+      if (++step >= steps) {
+        clearInterval(iv)
+        this._serverTimeOffset = target
+      }
+    }, stepMS)
+  }
+
+  /**
    * Creates our socket listeners
    */
   _constructSocketListeners () {
@@ -189,11 +263,19 @@ class Client extends EventEmitter {
       }, this._heartbeatMS)
       this.emit('connected')
       this.setChannel('lobby')
+      this._noteFlushInterval = setInterval(() => {
+        if (this._noteBufferTime && this._noteBuffer.length > 0) {
+          this.sendArray([{ m: 'n', t: this._noteBufferTime + this._serverTimeOffset, n: this._noteBuffer }])
+          this._noteBufferTime = 0
+          this._noteBuffer = []
+        }
+      }, this._noteFlushIntervalMS)
     })
 
     /* Handles our close event */
     this._ws.addEventListener('close', evt => {
       clearInterval(this._heartbeatInterval)
+      clearInterval(this._noteFlushInterval)
       if (!this.hasErrored) this.emit('disconnected')
     })
 
@@ -211,6 +293,12 @@ class Client extends EventEmitter {
         const transmission = JSON.parse(evt.data)
         for (var i = 0; i < transmission.length; i++) {
           var msg = transmission[i]
+          if (msg.m === 'hi') {
+            this._recieveServerTime(msg.t, msg.e || undefined)
+          }
+          if (msg.m === 't') {
+            this._recieveServerTime(msg.t, msg.e || undefined)
+          }
           if (msg.m === 'a') {
             this.emit('message', {
               content: msg.a,
@@ -248,7 +336,6 @@ class Client extends EventEmitter {
             this.room.users = this.room.users.filter(e => e.id !== msg.p)
             this.emit('userLeave', user)
           }
-
           if (msg.m === 'ls') {
             this.rooms = []
             msg.u.forEach(room => {
@@ -259,7 +346,6 @@ class Client extends EventEmitter {
             })
             this._sendArray([{ m: '-ls' }])
           }
-
           if (msg.m === 'n') {
             this.emit('notePress', {
               note: msg.n,

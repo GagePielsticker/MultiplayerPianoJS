@@ -102,6 +102,18 @@ _Gives crown to specific user, must be owner_
 
 Returns: `Promise`
 
+- **startNote(String Note, Int Velocity)**
+
+_Play a specific note_
+
+Returns: `Promise`
+
+- **stopNote(String Note)**
+
+_Stop a note from playing_
+
+Returns: `Promise`
+
 ## Events
 - **connected**
 
