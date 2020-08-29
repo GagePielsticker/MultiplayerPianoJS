@@ -80,6 +80,7 @@ class Client extends EventEmitter {
   playMidi (path) {
     return new Promise((resolve, reject) => {
       try {
+        this._player.stop()
         this._player.loadFile(path)
         this._player.play()
         resolve()

@@ -29,6 +29,8 @@ mpp.on('message', msg => {
   }
   if (msg.content === '!play') {
     mpp.playMidi(__dirname + '/midi/test.MID')
+      .catch(console.log)
+      .then(mpp.sendMessage('playing!'))
   }
 })
 
