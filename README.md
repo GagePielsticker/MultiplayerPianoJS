@@ -44,6 +44,9 @@ mpp.on('message', msg => {
   if (msg.content === '!allrooms') {
     console.log(mpp.rooms)
   }
+  if (msg.content === '!play') {
+    mpp.playMidi(__dirname + '/midi/test.MID')
+  }
 })
 
 mpp.on('userJoin', user => {
@@ -55,6 +58,7 @@ mpp.on('userLeave', user => {
   console.log(`user left: ${user.name}`)
   mpp.sendMessage(`Goodbye ${user.name}`)
 })
+
 ```
 ## Methods/Functions
 
@@ -114,6 +118,14 @@ _Stop a note from playing_
 
 Returns: `Promise`
 
+- **playMidi(String path)**
+
+_Plays a midi file_
+
+- **stopMidi()**
+
+Stops the playing of a midi file_
+
 ## Events
 - **connected**
 
@@ -170,6 +182,7 @@ _Currently connected proxy_
 - https-proxy-agent
 - socks-proxy-agent
 - ws
+- midi-player-js
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

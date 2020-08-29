@@ -27,6 +27,9 @@ mpp.on('message', msg => {
   if (msg.content === '!allrooms') {
     console.log(mpp.rooms)
   }
+  if (msg.content === '!play') {
+    mpp.playMidi(__dirname + '/midi/test.MID')
+  }
 })
 
 mpp.on('userJoin', user => {

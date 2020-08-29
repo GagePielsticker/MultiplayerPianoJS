@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 const EventEmitter = require('events').EventEmitter
 const HttpsProxyAgent = require('https-proxy-agent')
 const SocksProxyAgent = require('socks-proxy-agent')
+const MidiPlayer = require('midi-player-js')
 
 class Client extends EventEmitter {
   constructor (proxy) {
@@ -29,6 +30,25 @@ class Client extends EventEmitter {
 
     this._noteBuffer = []
     this._noteFlushInterval = undefined
+
+    this._pianoSettings = require('./settings/keyMap.json')
+    this._player = new MidiPlayer.Player(event => {
+      console.log(event)
+      if (event.name === 'Controller Change') {
+        if (event.value === 127) {
+          // start sustain
+        }
+        if (event.value === 71) {
+          // stop sustain
+        }
+      }
+      if (event.name === 'Note on') {
+        this.startNote(this._pianoSettings[event.noteName], event.velocity / 100)
+      }
+      if (event.name === 'Note off') {
+        this.stopNote(this._pianoSettings[event.noteName])
+      }
+    })
   }
 
   /* The following is client functions */
@@ -51,6 +71,22 @@ class Client extends EventEmitter {
         this._ws.close()
       }
     }, this._socketTimeoutMS)
+  }
+
+  /**
+   * Plays a midi file from path
+   * @param {String} path
+   */
+  playMidi (path) {
+    this._player.loadFile(path)
+    this._player.play()
+  }
+
+  /**
+   * Stops the playing of the midi file
+   */
+  stopMidi () {
+    this._player.stop()
   }
 
   /**
@@ -148,7 +184,7 @@ class Client extends EventEmitter {
   giveCrown (id) {
     return new Promise((resolve, reject) => {
       try {
-        this.sendArray([{ m: 'chown', id }])
+        this._sendArray([{ m: 'chown', id }])
         resolve()
       } catch (e) {
         reject(e)
@@ -177,7 +213,7 @@ class Client extends EventEmitter {
           this._noteBuffer.push({ n: note, v: vel })
           resolve()
         } else {
-          this._noteBuffer.push({ d: Date.now() - this.noteBufferTime, n: note, v: vel })
+          this._noteBuffer.push({ d: Date.now() - this._noteBufferTime, n: note, v: vel })
           resolve()
         }
       } catch (e) {
@@ -265,7 +301,7 @@ class Client extends EventEmitter {
       this.setChannel('lobby')
       this._noteFlushInterval = setInterval(() => {
         if (this._noteBufferTime && this._noteBuffer.length > 0) {
-          this.sendArray([{ m: 'n', t: this._noteBufferTime + this._serverTimeOffset, n: this._noteBuffer }])
+          this._sendArray([{ m: 'n', t: this._noteBufferTime + this._serverTimeOffset, n: this._noteBuffer }])
           this._noteBufferTime = 0
           this._noteBuffer = []
         }
