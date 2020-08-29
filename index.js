@@ -78,15 +78,29 @@ class Client extends EventEmitter {
    * @param {String} path
    */
   playMidi (path) {
-    this._player.loadFile(path)
-    this._player.play()
+    return new Promise((resolve, reject) => {
+      try {
+        this._player.loadFile(path)
+        this._player.play()
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   /**
    * Stops the playing of the midi file
    */
   stopMidi () {
-    this._player.stop()
+    return new Promise((resolve, reject) => {
+      try {
+        this._player.stop()
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   /**

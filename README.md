@@ -122,9 +122,13 @@ Returns: `Promise`
 
 _Plays a midi file_
 
+Returns: `Promise`
+
 - **stopMidi()**
 
 Stops the playing of a midi file_
+
+Returns: `Promise`
 
 ## Events
 - **connected**
