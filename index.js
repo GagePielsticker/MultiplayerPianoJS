@@ -7,6 +7,8 @@ const MidiPlayer = require('midi-player-js')
 class Client extends EventEmitter {
   constructor (proxy) {
     super()
+
+    // These are available to the client
     this.uri = 'wss://www.multiplayerpiano.com'
     this.proxy = proxy
     this.rooms = []
@@ -15,6 +17,7 @@ class Client extends EventEmitter {
       users: []
     }
 
+    // These are for internal use
     this._ws = undefined
     this._heartbeatInterval = undefined
 
