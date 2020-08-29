@@ -33,7 +33,7 @@ class Client extends EventEmitter {
 
     this._pianoSettings = require('./settings/keyMap.json')
     this._player = new MidiPlayer.Player(event => {
-      console.log(event)
+      this._constructMIDIListeners()
       if (event.name === 'Controller Change') {
         if (event.value === 127) {
           // start sustain
@@ -295,6 +295,27 @@ class Client extends EventEmitter {
         this._serverTimeOffset = target
       }
     }, stepMS)
+  }
+
+  /**
+   * Creates our midi player listeners
+   */
+  _constructMIDIListeners () {
+    this._player.on('fileLoaded', () => {
+      this.emit('midiLoaded')
+    })
+
+    this._player.on('playing', () => {
+      this.emit('midiPlaying')
+    })
+
+    this._player.on('midiEvent', event => {
+      this.emit('midiEvent', event)
+    })
+
+    this._player.on('endOfFile', () => {
+      this.emit('midiEnded')
+    })
   }
 
   /**

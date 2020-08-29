@@ -169,6 +169,24 @@ _Fired on chat message recieve_
 
 Callback: `Message Object`
 
+- **midiLoaded**
+
+_Fired on midi file loaded_
+
+- **midiPlaying**
+
+_Fired on midi file playing_
+
+- **midiEvent**
+
+_Fired on midi file event_
+
+callback: `event object`
+
+- **midiEnded**
+
+_Fired on midi file end_
+
 ## Properties
 - **room**
 
