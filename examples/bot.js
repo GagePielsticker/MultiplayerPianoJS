@@ -28,7 +28,7 @@ mpp.on('message', msg => {
     console.log(mpp.rooms)
   }
   if (msg.content === '!play') {
-    mpp.playMidi(__dirname + '/midi/test.MID')
+    mpp.playMidi(__dirname + '/midi/test2.MID')
       .catch(console.log)
       .then(mpp.sendMessage('playing!'))
   }
@@ -45,5 +45,5 @@ mpp.on('userLeave', user => {
 })
 
 mpp.on('notePress', note => {
-  console.log(note)
+  // console.log(note)
 })

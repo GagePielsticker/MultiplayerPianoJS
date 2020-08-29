@@ -31,22 +31,30 @@ class Client extends EventEmitter {
     this._noteBuffer = []
     this._noteFlushInterval = undefined
 
+    this._sustainToggle = false
+    this._sustainCheckIntervalMS = 10
+
     this._pianoSettings = require('./settings/keyMap.json')
     this._player = new MidiPlayer.Player(event => {
       this._constructMIDIListeners()
       if (event.name === 'Controller Change') {
-        if (event.value === 127) {
-          // start sustain
-        }
-        if (event.value === 71) {
-          // stop sustain
-        }
+        if (event.value === 127) this._sustainToggle = true
+        if (event.value === 71) this._sustainToggle = false
       }
       if (event.name === 'Note on') {
         this.startNote(this._pianoSettings[event.noteName], event.velocity / 100)
       }
       if (event.name === 'Note off') {
-        this.stopNote(this._pianoSettings[event.noteName])
+        if (!this._sustainToggle) {
+          this.stopNote(this._pianoSettings[event.noteName])
+        } else {
+          const temp = setInterval(() => {
+            if (!this._sustainToggle) {
+              this.stopNote(this._pianoSettings[event.noteName])
+              clearInterval(temp)
+            }
+          }, this._sustainCheckIntervalMS)
+        }
       }
     })
   }
@@ -80,6 +88,7 @@ class Client extends EventEmitter {
   playMidi (path) {
     return new Promise((resolve, reject) => {
       try {
+        this._sustainToggle = false
         this._player.stop()
         this._player.loadFile(path)
         this._player.play()
