@@ -35,7 +35,7 @@ class Client extends EventEmitter {
     this._noteFlushInterval = undefined
 
     this._sustainToggle = false
-    this._sustainCheckIntervalMS = 10
+    this._sustainCheckIntervalMS = 0
 
     this._pianoSettings = require('./settings/keyMap.json')
     this._player = new MidiPlayer.Player(event => {

@@ -6,7 +6,7 @@ mpp.connect()
 mpp.on('connected', () => {
   console.log('bot connected')
   mpp.setName('Mr Roboto')
-  mpp.setChannel('my room')
+  mpp.setChannel('jeffsroom')
     .then(() => console.log('Channel Set!'))
 })
 
