@@ -190,13 +190,13 @@ class Client extends EventEmitter {
   }
 
   /**
-   * Kicks user id from room
+   * Kicks user id from room for a specific time
    * @param {String} id
    */
-  kickUser (id) {
+  kickUser (id, timeInMS = 1) {
     return new Promise((resolve, reject) => {
       try {
-        this._sendArray([{ m: 'kickban', _id: id, ms: 1 }])
+        this._sendArray([{ m: 'kickban', _id: id, ms: timeInMS }])
         resolve()
       } catch (e) {
         reject(e)

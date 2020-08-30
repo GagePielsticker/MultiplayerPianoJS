@@ -95,9 +95,9 @@ _Moves mouse position_
 
 Returns: `Promise`
 
-- **kickUser(String userID)**
+- **kickUser(String userID, Int timeInMS)**
 
-_Kicks user from room, must be owner_
+_Kicks user from room for a specific time, must be owner_
 
 Returns: `Promise`
 
