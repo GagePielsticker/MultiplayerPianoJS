@@ -163,7 +163,7 @@ class Client extends EventEmitter {
     return new Promise((resolve, reject) => {
       name = name || 'Bot'
       try {
-        this._sendArray([{ m: 'userset', name }])
+        this._sendArray([{ m: 'userset', set: { name } }])
         resolve()
       } catch (e) {
         reject(e)
