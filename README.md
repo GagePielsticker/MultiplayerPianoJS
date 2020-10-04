@@ -3,7 +3,7 @@
 
 [![Known Vulnerabilities](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS/badge.svg?targetFile=package.json)](https://snyk.io/test/github/GagePielsticker/MultiplayerPianoJS?targetFile=package.json) [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/GagePielsticker/Express-API-Boilerplate/blob/master/LICENSE.md) ![GitHub last commit](https://img.shields.io/github/last-commit/gagepielsticker/Express-API-Boilerplate) ![Updates](https://img.shields.io/david/GagePielsticker/MultiplayerPianoJS)
 
-[Join the discord](https://discord.gg/RKY9Yx5)
+[Join the discord](https://discord.gg/8PmWZKb)
 ## Foreword
 
 > This was created as a response to the massive lack of libs/support presented in the MPP dev community. I intend to maintain and improve it for the foreseeable future. 
