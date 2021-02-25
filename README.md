@@ -6,8 +6,7 @@
 [Join the discord](https://discord.gg/8PmWZKb)
 ## Foreword
 
-> This was created as a response to the massive lack of libs/support presented in the MPP dev community. I intend to maintain and improve it for the foreseeable future. 
-
+> This is now depricated as mpp was sold to a new owner whom created a new system. Repo will be archived soon.
 ## Installation
 **Node.js 12.0.0 or newer is required.**
 
