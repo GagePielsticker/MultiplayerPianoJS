@@ -2,64 +2,48 @@ const WebSocket = require('ws')
 const EventEmitter = require('events').EventEmitter
 const HttpsProxyAgent = require('https-proxy-agent')
 const SocksProxyAgent = require('socks-proxy-agent')
-const MidiPlayer = require('midi-player-js')
 
 class Client extends EventEmitter {
-  constructor (proxy) {
+  constructor (token, proxy) {
     super()
 
     // These are available to the client
-    this.uri = 'wss://www.multiplayerpiano.com'
+    this.uri = 'wss://www.mppclone.com'
     this.proxy = proxy
-    this.rooms = []
-    this.room = {
-      name: undefined,
-      users: []
-    }
+
+    this.token = token
+
+    this.user = {}
+    this.room = {}
 
     // These are for internal use
     this._ws = undefined
-    this._heartbeatInterval = undefined
-
     this._isConnected = false
-    this._channelHasJoined = false
-
-    this._socketTimeoutMS = 10000
     this._heartbeatMS = 20000
-    this._roomScanMS = 2000
-    this._noteBufferTime = 0
-    this._noteFlushIntervalMS = 200
-    this._serverTimeOffset = 0
+    this._heartbeat = undefined
+    this._socketTimeoutMS = 5000
+    this._defaultName = 'bot'
+    this._defaultLobby = 'lobby'
+    this._defaultColor = '#ff8ff9'
+  }
 
-    this._noteBuffer = []
-    this._noteFlushInterval = undefined
+  /**
+   * Hard error exit handling
+   * @param {String} str
+   */
+  _hardExit (str) {
+    const error = new Error(str)
+    console.log(error.stack)
+    process.exit(1)
+  }
 
-    this._sustainToggle = false
-    this._sustainCheckIntervalMS = 0
-
-    this._pianoSettings = require('./settings/keyMap.json')
-    this._player = new MidiPlayer.Player(event => {
-      this._constructMIDIListeners()
-      if (event.name === 'Controller Change') {
-        if (event.value === 127) this._sustainToggle = true
-        if (event.value === 71) this._sustainToggle = false
-      }
-      if (event.name === 'Note on') {
-        this.startNote(this._pianoSettings[event.noteName], event.velocity / 100)
-      }
-      if (event.name === 'Note off') {
-        if (!this._sustainToggle) {
-          this.stopNote(this._pianoSettings[event.noteName])
-        } else {
-          const temp = setInterval(() => {
-            if (!this._sustainToggle) {
-              this.stopNote(this._pianoSettings[event.noteName])
-              clearInterval(temp)
-            }
-          }, this._sustainCheckIntervalMS)
-        }
-      }
-    })
+  _setupHeartbeat () {
+    this._heartbeat = setInterval(() => {
+      this._sendArray([{
+        m: 't',
+        e: +new Date()
+      }])
+    }, this._heartbeatMS)
   }
 
   /* The following is client functions */
@@ -68,9 +52,11 @@ class Client extends EventEmitter {
    * Connects the websocket
    */
   connect () {
+    if (!this.token) return this._hardExit('You MUST provide a valid bot token or else the system will ban you for 24 hours.')
+
     /* Connect our websocket */
     this._ws = new WebSocket(this.uri, {
-      origin: 'https://www.multiplayerpiano.com',
+      origin: this.uri,
       agent: this.proxy ? this.proxy.startsWith('socks') ? new SocksProxyAgent(this.proxy) : new HttpsProxyAgent(this.proxy) : undefined
     })
 
@@ -78,369 +64,203 @@ class Client extends EventEmitter {
 
     setTimeout(() => {
       if (!this._isConnected) {
-        this.emit('error', new Error('Bot failed to connect to websocket in 10 seconds.'))
         this._ws.close()
+        _hardExit('Socket connection timed out')
       }
     }, this._socketTimeoutMS)
-  }
-
-  /**
-   * Plays a midi file from path
-   * @param {String} path
-   */
-  playMidi (path) {
-    return new Promise((resolve, reject) => {
-      try {
-        this._sustainToggle = false
-        this._player.stop()
-        this._player.loadFile(path)
-        this._player.play()
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Stops the playing of the midi file
-   */
-  stopMidi () {
-    return new Promise((resolve, reject) => {
-      try {
-        this._player.stop()
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Joins a channel
-   * @param {String} channelName Name of channel to join
-   */
-  setChannel (channelName) {
-    return new Promise((resolve, reject) => {
-      const name = channelName || 'lobby'
-      this.room = {
-        name: undefined,
-        users: []
-      }
-      this._sendArray([{ m: 'ch', _id: name, set: undefined }])
-
-      const checker = setInterval(() => {
-        if (this._channelHasJoined) {
-          resolve()
-          this._channelHasJoined = false
-          clearInterval(checker)
-        }
-      }, 100)
-    })
-  }
-
-  /**
-   * Sends a message in the current channel
-   * @param {String} message Message to send
-   */
-  sendMessage (message) {
-    return new Promise((resolve, reject) => {
-      message = message || ''
-      try {
-        this._sendArray([{ m: 'a', message }])
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Sets current username
-   * @param {String} name Name to use
-   */
-  setName (name) {
-    return new Promise((resolve, reject) => {
-      name = name || 'Bot'
-      try {
-        this._sendArray([{ m: 'userset', set: { name } }])
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Move mouse cursor
-   * @param {Integer} x Mouse x position
-   * @param {Integer} y Mouse y position
-   */
-  moveMouse (x, y) {
-    return new Promise((resolve, reject) => {
-      x = x || 0
-      y = y || 0
-      try {
-        this._sendArray([{ m: 'm', x, y }])
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Kicks user id from room for a specific time
-   * @param {String} id
-   */
-  kickUser (id, timeInMS = 1) {
-    return new Promise((resolve, reject) => {
-      try {
-        this._sendArray([{ m: 'kickban', _id: id, ms: timeInMS }])
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Gives crown to a specific user
-   * @param {String} id
-   */
-  giveCrown (id) {
-    return new Promise((resolve, reject) => {
-      try {
-        this._sendArray([{ m: 'chown', id }])
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
   }
 
   /**
    * Closes the websocket
    */
   disconnect () {
+    clearInterval(this._heartbeat)
     this._ws.close()
-  }
-
-  /**
-   * Starts a note with a specific velocity
-   * @param {String} note
-   * @param {Integer} vel
-   */
-  startNote (note, vel) {
-    return new Promise((resolve, reject) => {
-      try {
-        vel = typeof vel === 'undefined' ? undefined : +vel.toFixed(3)
-        if (!this._noteBufferTime) {
-          this._noteBufferTime = Date.now()
-          this._noteBuffer.push({ n: note, v: vel })
-          resolve()
-        } else {
-          this._noteBuffer.push({ d: Date.now() - this._noteBufferTime, n: note, v: vel })
-          resolve()
-        }
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /**
-   * Will stop a note from playing
-   * @param {String} note
-   */
-  stopNote (note) {
-    return new Promise((resolve, reject) => {
-      try {
-        if (!this._noteBufferTime) {
-          this._noteBufferTime = Date.now()
-          this._noteBuffer.push({ n: note, s: 1 })
-          resolve()
-        } else {
-          this._noteBuffer.push({ d: Date.now() - this._noteBufferTime, n: note, s: 1 })
-          resolve()
-        }
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  /* The following is internal use functions not necessarily used for the client */
-
-  /**
-   * Sends data through the websocket
-   * @param {Websocket Data} data
-   */
-  _sendSocket (data) {
-    return this._ws.send(data)
-  }
-
-  /**
-   * Stringifies array/object data to be sent to WS
-   * @param {Array} data
-   */
-  _sendArray (data) {
-    return this._sendSocket(JSON.stringify(data))
-  }
-
-  /**
-   * Recieves and calculates server offset
-   * @param {time} time
-   */
-  _recieveServerTime (time) {
-    const now = Date.now()
-    const target = time - now
-    const duration = 1000
-    let step = 0
-    const steps = 50
-    const stepMS = duration / steps
-    const difference = target - this._serverTimeOffset
-    const inc = difference / steps
-    const iv = setInterval(() => {
-      this._serverTimeOffset += inc
-      if (++step >= steps) {
-        clearInterval(iv)
-        this._serverTimeOffset = target
-      }
-    }, stepMS)
-  }
-
-  /**
-   * Creates our midi player listeners
-   */
-  _constructMIDIListeners () {
-    this._player.on('fileLoaded', () => {
-      this.emit('midiLoaded')
-    })
-
-    this._player.on('playing', () => {
-      this.emit('midiPlaying')
-    })
-
-    this._player.on('midiEvent', event => {
-      this.emit('midiEvent', event)
-    })
-
-    this._player.on('endOfFile', () => {
-      this.emit('midiEnded')
-    })
   }
 
   /**
    * Creates our socket listeners
    */
   _constructSocketListeners () {
-    /* Handles our open event */
+    /* Open our socket to the server */
     this._ws.addEventListener('open', evt => {
-      setInterval(() => {
-        this._sendArray([{ m: '+ls' }])
-      }, this._roomScanMS)
-      this._isConnected = true
-      this._sendArray([{ m: 'hi' }])
-      this._heartbeatInterval = setInterval(() => {
-        this._sendArray([{ m: 't', e: Date.now() }])
-      }, this._heartbeatMS)
-      this.emit('connected')
-      this.setChannel('lobby')
-      this._noteFlushInterval = setInterval(() => {
-        if (this._noteBufferTime && this._noteBuffer.length > 0) {
-          this._sendArray([{ m: 'n', t: this._noteBufferTime + this._serverTimeOffset, n: this._noteBuffer }])
-          this._noteBufferTime = 0
-          this._noteBuffer = []
-        }
-      }, this._noteFlushIntervalMS)
-    })
-
-    /* Handles our close event */
-    this._ws.addEventListener('close', evt => {
-      clearInterval(this._heartbeatInterval)
-      clearInterval(this._noteFlushInterval)
-      if (!this.hasErrored) this.emit('disconnected')
+      this._sendArray([{
+        m: 'hi',
+        token: this.token
+      }])
     })
 
     /* Handles our errors */
     this._ws.addEventListener('error', error => {
-      if (error.message === 'WebSocket was closed before the connection was established') return
-      this.emit('error', new Error(error))
       this._ws.close()
+      this._hardExit(`Websocket connection has errored :: ${error.message}`)
     })
 
-    /* Handles generic messages */
+    /* Handles generic incoming messages */
     this._ws.addEventListener('message', evt => {
       if (typeof evt.data !== 'string') return
       try {
         const transmission = JSON.parse(evt.data)
-        for (var i = 0; i < transmission.length; i++) {
-          var msg = transmission[i]
-          if (msg.m === 'hi') {
-            this._recieveServerTime(msg.t, msg.e || undefined)
-          }
-          if (msg.m === 't') {
-            this._recieveServerTime(msg.t, msg.e || undefined)
-          }
-          if (msg.m === 'a') {
-            this.emit('message', {
-              content: msg.a,
-              user: {
-                id: msg.p.id,
-                name: msg.p.name,
-                color: msg.p.color
-              },
-              time: msg.t
-            })
-          }
-          if (msg.m === 'ch') {
-            this.room.name = msg.ch._id
-            this._channelHasJoined = true
-            if (this.room.users.length !== 0) return
-            msg.ppl.forEach(person => {
-              this.room.users.push({
-                id: person.id,
-                name: person.name,
-                color: person.color
-              })
-            })
-          }
-          if (msg.m === 'p') {
-            const formattedUser = {
-              id: msg.id,
-              name: msg.name,
-              color: msg.color
-            }
-            this.emit('userJoined', formattedUser)
-            this.room.users.push(formattedUser)
-          }
-          if (msg.m === 'bye') {
-            const user = this.room.users.filter(e => e.id === msg.p)[0]
-            this.room.users = this.room.users.filter(e => e.id !== msg.p)
-            this.emit('userLeave', user)
-          }
-          if (msg.m === 'ls') {
-            this.rooms = []
-            msg.u.forEach(room => {
-              this.rooms.push({
-                name: room._id,
-                count: room.count
-              })
-            })
-            this._sendArray([{ m: '-ls' }])
-          }
-          if (msg.m === 'n') {
-            this.emit('notePress', {
-              note: msg.n,
-              user: msg.p
-            })
-          }
+        for (let i = 0; i < transmission.length; i++) {
+          const msg = transmission[i]
+          this._messageChofer(msg)
         }
       } catch (error) {
-        this.emit('error', error)
+        this._hardExit(`Error recieving websocket message :: ${error.message}`)
       }
     })
+  }
+
+  /**
+   * Handles orchestrating incoming messages
+   * @param {Object} msg websocket message
+   */
+  _messageChofer (msg) {
+    /* On response to greeting (connected) */
+    if (msg.m === 'hi') {
+      this.user = msg.u
+      this.user.id = this.user._id
+      this.user.mouse = {
+        x: undefined,
+        y: undefined
+      }
+      this._isConnected = true
+      this._setupHeartbeat()
+      this.emit('connected')
+    }
+
+    // Chat message
+    if (msg.m === 'a') {
+      this.emit('message', {
+        unixTime: msg.t,
+        content: msg.a,
+        author: msg.p
+      })
+    }
+
+    // Channel Settings change / channel join
+    if (msg.m === 'ch') {
+
+      //Sanitize the users pos's from string to int &  Get the bots mouse position
+      msg.ppl.map(e => {
+        e.x = parseFloat(e.x)
+        e.y = parseFloat(e.y)
+
+        if (e.id === this.user.id) {
+          this.user.mouse.x = parseFloat(e.x)
+          this.user.mouse.y = parseFloat(e.y)
+        }
+      })
+
+      this.room = {
+        settings: msg.ch.settings,
+        id: msg.ch.id,
+        crown: msg.ch.crown,
+        users: msg.ppl
+      }
+    }
+
+    // On user mouse position change
+    if (msg.m === 'm') {
+      if (this.room.users) {
+        this.room.users.map(e => {
+          if (e.id === msg.id) {
+            e.x = parseFloat(msg.x)
+            e.y = parseFloat(msg.y)
+          }
+        })
+      }
+    }
+
+    // On user leave
+    if (msg.m === 'bye') {
+      if (this.room.users) {
+        let user = this.room.users.find(e => e.id === msg.p)
+        let index = this.room.users.findIndex(e => e.id === msg.p)
+        this.room.users.splice(index, 1)
+        this.emit('userLeave', user)
+      }
+    }
+
+    // On user join
+    if (msg.m === 'p') {
+      if (this.room.users) {
+        delete msg.m
+        this.room.users.push(msg)
+        this.emit('userJoin', msg)
+      }
+    }
+
+    //console.log(msg)
+  }
+
+  /**
+   * Sends data through the websocket
+   * @param {Websocket Data} data
+   */
+  _sendSocket (data) {
+    this._ws.send(data)
+  }
+
+  /**
+     * Stringifies array/object data to be sent to WS
+     * @param {Array} data
+     */
+  _sendArray (data) {
+    // If data is attempted to be sent while not connected, error.
+    if (!this._isConnected && data[0].m !== 'hi') return this._hardExit('Attempted to send data whiel socket not connected. Please wait for connection event.')
+    return this._sendSocket(JSON.stringify(data))
+  }
+
+  /**
+   * Attempts to connect to a channel
+   * @param {String} str
+   * @param {Boolean} visible
+   */
+  setChannel (str, visible) {
+    this._sendArray([{
+      m: 'ch',
+      _id: str || this._defaultLobby,
+      set: {
+        visible: visible || true
+      }
+    }])
+  }
+
+  /**
+     * Sets client name
+     * @param {String} str Name to set
+     * @param {String} clr Hex color of nametag
+     */
+  setUser (str, clr) {
+    this._sendArray([{
+      m: 'userset',
+      set: {
+        name: str || this._defaultName,
+        color: clr || this._defaultColor
+      }
+    }])
+
+    this.user.name = str || this._defaultName
+    this.user.color = clr || this._defaultColor
+  }
+
+  /**
+     * Moves User cursor
+     * @param {Int} x
+     * @param {Int} y
+     */
+  moveMouse (x, y) {
+    this._sendArray([{
+      m: 'm',
+      x: x,
+      y: y
+    }])
+
+    this.user.mouse = {
+      x: x,
+      y: y
+    }
   }
 }
 

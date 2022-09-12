@@ -1,6 +1,6 @@
 {
   "name": "multiplayerpianojs",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "description": "An easy to use promise based NodeJS library for Multiplayerpiano.com otherwise known as MPP to create chat bots.",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,8 @@
     "url": "git+https://github.com/GagePielsticker/MultiplayerPianoJS.git"
   },
   "scripts": {
-    "test": "jest ./test"
+    "test": "jest ./test",
+    "example": "node ./examples/bot.js"
   },
   "author": "Gage Pielsticker",
   "license": "MIT",
@@ -37,7 +38,6 @@
   ],
   "dependencies": {
     "https-proxy-agent": "^5.0.0",
-    "midi-player-js": "^2.0.13",
     "socks-proxy-agent": "^5.0.0",
     "ws": "^7.3.1"
   },

@@ -1,49 +1,42 @@
 const MPPClient = require('../index')
-const mpp = new MPPClient()
-// const mpp = new MPPClient(SCOCKS/HTTPS PROXY HERE) alternatively
+const mpp = new MPPClient('Your Token')
+
+// const mpp = new MPPClient(token, SCOCKS/HTTPS PROXY HERE) alternatively
 mpp.connect()
 
+// On connect
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setName('Mr Roboto')
-  mpp.setChannel('jeffsroom')
-    .then(() => console.log('Channel Set!'))
-})
-
-// These are chat messages
-mpp.on('message', msg => {
-  if (msg.content === '!ping') {
-    mpp.sendMessage('Pong!')
-  }
-  if (msg.content === '!disconnect') {
-    mpp.disconnect()
-  }
-  if (msg.content === '!kickme') {
-    mpp.kickUser(msg.user.id)
-  }
-  if (msg.content === '!givemecrown') {
-    mpp.giveCrown(msg.user.id)
-  }
-  if (msg.content === '!allrooms') {
-    console.log(mpp.rooms)
-  }
-  if (msg.content === '!play') {
-    mpp.playMidi(__dirname + '/midi/test2.MID')
-      .catch(console.log)
-      .then(mpp.sendMessage('playing!'))
-  }
-})
-
-mpp.on('userJoin', user => {
-  console.log(`user joined: ${user.name}`)
-  mpp.sendMessage(`Welcome ${user.name}`)
+  mpp.setChannel('test3')
 })
 
 mpp.on('userLeave', user => {
-  console.log(`user left: ${user.name}`)
-  mpp.sendMessage(`Goodbye ${user.name}`)
+  console.log(`User left: ${user.name}`)
 })
 
-mpp.on('notePress', note => {
-  // console.log(note)
+mpp.on('userJoin', user => {
+  console.log(`User joined: ${user.name}`)
+})
+
+// Example chat message event
+mpp.on('message', msg => {
+  const args = msg.content.split(' ')
+
+  if (msg.author._id === '1c7d9536250eb1f43652f4c0') {
+    if (args[0] === '!setname') {
+      mpp.setUser(args[1])
+    }
+
+    if (args[0] === '!joinroom') {
+      mpp.setChannel(args[1])
+    }
+
+    if (args[0] === '!move') {
+      mpp.moveMouse(args[1], args[2])
+    }
+
+    if (args[0] === '!eval') {
+      console.log(mpp[args[1]])
+    }
+  }
 })
