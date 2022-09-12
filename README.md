@@ -15,6 +15,8 @@ To get one, join the discord https://discord.gg/338D2xMufC . Using this without 
 
 # Example Usage
 Bigger example seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
+
+Full bot framework seen [here](https://github.com/GagePielsticker/MPP-Bot-Template)
 ```js
 const MPPClient = require('multiplayerpianojs')
 const mpp = new MPPClient('Your Token')
