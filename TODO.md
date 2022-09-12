@@ -8,43 +8,45 @@ https://github.com/LapisHusky/mppclone/wiki/Protocol
 - [x] Heartbeat
 
 ** Client -> Server Messages
-- [ ] A
-- [ ] Bye
+- [x] A
+- [x] Bye
 - [x] Ch
-- [ ] Chown
-- [ ] Chset
-- [ ] Custom
-- [ ] Devices
-- [ ] Dm
+- [x] Chown
+- [x] Chset
+- [ ] Custom - Maybe in the future?
+- [ ] Devices - Not needed for bots
+- [x] Dm
 - [x] Hi
-- [ ] Kickban
+- [x] Kickban
 - [x] M
-- [ ] -custom
-- [ ] -ls
-- [ ] n
-- [ ] +custom
-- [ ] +ls
-- [ ] T
-- [ ] Unban
+- [ ] -custom - Maybe in the future?
+- [ ] -ls - Not needed
+- [x] n
+- [ ] +custom - Maybe in the future?
+- [x] +ls
+- [x] T
+- [x] Unban
 - [x] Userset
 
 ** Server -> Client Messages
 - [x] A
-- [ ] B
+- [ ] B - Not needed
 - [x] Bye
-- [ ] C
+- [ ] C - Maybe in future?
 - [x] Ch
-- [ ] Custom
-- [ ] Dm
+- [ ] Custom - Maybe in future?
+- [x] Dm
 - [x] Hi
-- [ ] Ls
+- [x] Ls
 - [x] M
-- [ ] N
-- [ ] Notification
-- [ ] Nq
+- [x] N
+- [ ] Notification - Not needed?
+- [ ] Nq - Maybe in future
 - [x] P
-- [ ] T
+- [x] T
 
 ** Custom
 - [x] Keymap for midi player
 - [ ] Midi Player Implementation
+- [ ] Midi Recorder Implementation
+- [ ] Unit Test

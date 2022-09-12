@@ -11,10 +11,10 @@
 `npm install multiplayerpianojs`
 
 ### YOU MUST GET A TOKEN FROM MPPCLONE.COM OWNER!
-To get one on discord here https://discord.gg/338D2xMufC
+To get one, join the discord https://discord.gg/338D2xMufC . Using this without a token will result in a 24 hour ban so be careful!
 
 # Example Usage
-More seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
+Bigger example seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
 ```js
 const MPPClient = require('multiplayerpianojs')
 const mpp = new MPPClient('Your Token')
@@ -40,18 +40,12 @@ mpp.on('userJoin', user => {
 mpp.on('message', msg => {
   const args = msg.content.split(' ')
 
-  if (msg.author._id === '1c7d9536250eb1f43652f4c0') {
-    if (args[0] === '!setname') {
-      mpp.setUser(args[1])
-    }
+  if (args[0] === '!setname') {
+    mpp.setUser(args[1])
+  }
 
-    if (args[0] === '!joinroom') {
-      mpp.setChannel(args[1])
-    }
-
-    if (args[0] === '!move') {
-      mpp.moveMouse(args[1], args[2])
-    }
+  if (args[0] === '!joinroom') {
+    mpp.setChannel(args[1])
   }
 })
 
@@ -78,6 +72,58 @@ _Sets the current name & tag color_
 
 _Moves client mouse cursor_
 
+- **dm(String msg, String id)**
+
+_Sends a dm to a specific user_
+
+- **giveCrown(String id)**
+
+_If bot has crown (owner of room), give to user id_
+
+- **changeChannelSettings(Object settings)**
+
+_Change the room settings if owner_
+
+```js
+// Example Object of settings
+{
+  color: '#0066ff',
+  color2: '#ff9900',
+  chat: 'false'
+}
+```
+- **ban(String id, Int ms)**
+
+_Bans a user from channel for set time, requires owner/crown_
+
+- **unBan(String id)**
+
+_un-Bans a user from channel, requires owner/crown_
+
+- **sendMessage(String msg)**
+
+_Sends a message in chat_
+
+- **sendNotes(Array notes, Int time)**
+
+_Sends notes to be played at specific time, defaults to current time_
+
+```js
+// Example array of notes
+[
+  {
+    "n":"c3", //note
+    "v":0.75 //velocity
+  },
+  {
+    "n":"c3",
+    "d":100, //delay from message to trigger note ms
+    "s":1 //if the note is a note stop
+  }
+]
+```
+
+
 ## Events
 - **connected**
 
@@ -87,13 +133,21 @@ _Fired on bot connection to websocket_
 
 _Fired when chat message recieved_
 
+- **dm(Object)**
+
+_Fired when direct message is recieved_
+
 - **userJoin(Object)**
 
 _Fired when user joins the channel_
 
 - **userLeave(Object)**
 
-_Fired when user leaves the channe_
+_Fired when user leaves the channel_
+
+- **notes(Object)**
+
+_Fired when user sends notes_
 
 ## Properties
 
@@ -108,6 +162,10 @@ _Current user object_
 - **room**
 
 _Current room object_
+
+- **allRooms**
+
+_All current existing rooms_
 
 - **token**
 

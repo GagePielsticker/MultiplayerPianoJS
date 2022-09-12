@@ -1,5 +1,5 @@
 const MPPClient = require('../index')
-const mpp = new MPPClient('Your Token')
+const mpp = new MPPClient('YOUR TOKEN')
 
 // const mpp = new MPPClient(token, SCOCKS/HTTPS PROXY HERE) alternatively
 mpp.connect()
@@ -16,6 +16,14 @@ mpp.on('userLeave', user => {
 
 mpp.on('userJoin', user => {
   console.log(`User joined: ${user.name}`)
+})
+
+mpp.on('dm', msg => {
+  console.log(`User ${msg.author.name} dm'd you : ${msg.content}`)
+})
+
+mpp.on('notes', msg => {
+  //console.log(msg)
 })
 
 // Example chat message event
@@ -35,8 +43,34 @@ mpp.on('message', msg => {
       mpp.moveMouse(args[1], args[2])
     }
 
-    if (args[0] === '!eval') {
-      console.log(mpp[args[1]])
+    if (args[0] === '!dm') {
+      mpp.sendMessage(`Sent you a dm ${msg.author.name}!`)
+      mpp.dm(args[1], msg.author.id)
+    }
+
+    if (args[0] === '!banme') {
+      mpp.ban(msg.author.id, 1000)
+    }
+
+    if (args[0] === '!givecrown') {
+      mpp.giveCrown(msg.author.id)
+    }
+
+    if (args[0] === '!changesettings') {
+      mpp.changeChannelSettings({
+        color: '#0066ff',
+        color2: '#ff9900',
+        chat: 'true'
+      })
+    }
+
+    if (args[0] === '!sendNotes') {
+      mpp.sendNotes([
+        {
+          "n":"c3",
+          "v":0.75
+        }
+      ])
     }
   }
 })

@@ -15,13 +15,15 @@ class Client extends EventEmitter {
 
     this.user = {}
     this.room = {}
+    this.allRooms = []
 
     // These are for internal use
     this._ws = undefined
     this._isConnected = false
-    this._heartbeatMS = 20000
+    this._heartbeatMS = 10000
     this._heartbeat = undefined
     this._socketTimeoutMS = 5000
+    this._serverOffset = 0
     this._defaultName = 'bot'
     this._defaultLobby = 'lobby'
     this._defaultColor = '#ff8ff9'
@@ -125,7 +127,14 @@ class Client extends EventEmitter {
         y: undefined
       }
       this._isConnected = true
+      this._sendArray([{
+        m: '+ls' // Subscribe to channel list updates
+      }])
+
+      this._serverOffset = msg.t - (+new Date()) //set the offset
+
       this._setupHeartbeat()
+      
       this.emit('connected')
     }
 
@@ -138,10 +147,14 @@ class Client extends EventEmitter {
       })
     }
 
+    // Heartbeat to update server offset
+    if (msg.m === 't') {
+      this._serverOffset = msg.t - (+new Date())
+    }
+
     // Channel Settings change / channel join
     if (msg.m === 'ch') {
-
-      //Sanitize the users pos's from string to int &  Get the bots mouse position
+      // Sanitize the users pos's from string to int &  Get the bots mouse position
       msg.ppl.map(e => {
         e.x = parseFloat(e.x)
         e.y = parseFloat(e.y)
@@ -160,6 +173,24 @@ class Client extends EventEmitter {
       }
     }
 
+    if (msg.m === 'ls') {
+      const test = this.allRooms.find(e => e.id === msg.u[0].id)
+
+      if (!test && msg.u[0].count === 0) return
+      if (!test) {
+        this.allRooms.push(msg.u[0])
+      } else {
+        let curInd
+        this.allRooms.map((e, ind) => {
+          if (e.id === msg.u[0].id) {
+            curInd = ind
+            e = msg.u[0]
+          }
+        })
+        if (msg.u[0].count === 0) this.allRooms.splice(curInd, 1)
+      }
+    }
+
     // On user mouse position change
     if (msg.m === 'm') {
       if (this.room.users) {
@@ -172,11 +203,28 @@ class Client extends EventEmitter {
       }
     }
 
+    // Handles dms
+    if (msg.m === 'dm') {
+      this.emit('dm', {
+        unixTime: msg.t,
+        content: msg.a,
+        author: msg.sender
+      })
+    }
+
+    if (msg.m === 'n') {
+      this.emit('notes', {
+        unixTime: msg.t,
+        id: msg.p,
+        notes: msg.n
+      })
+    }
+
     // On user leave
     if (msg.m === 'bye') {
       if (this.room.users) {
-        let user = this.room.users.find(e => e.id === msg.p)
-        let index = this.room.users.findIndex(e => e.id === msg.p)
+        const user = this.room.users.find(e => e.id === msg.p)
+        const index = this.room.users.findIndex(e => e.id === msg.p)
         this.room.users.splice(index, 1)
         this.emit('userLeave', user)
       }
@@ -191,7 +239,7 @@ class Client extends EventEmitter {
       }
     }
 
-    //console.log(msg)
+    // console.log(msg)
   }
 
   /**
@@ -208,7 +256,7 @@ class Client extends EventEmitter {
      */
   _sendArray (data) {
     // If data is attempted to be sent while not connected, error.
-    if (!this._isConnected && data[0].m !== 'hi') return this._hardExit('Attempted to send data whiel socket not connected. Please wait for connection event.')
+    if (!this._isConnected && data[0].m !== 'hi') return this._hardExit('Attempted to send data while socket not connected. Please wait for connection event.')
     return this._sendSocket(JSON.stringify(data))
   }
 
@@ -224,6 +272,76 @@ class Client extends EventEmitter {
       set: {
         visible: visible || true
       }
+    }])
+  }
+
+  /**
+   * Sends a message in chat
+   * @param {String} str
+   */
+  sendMessage (str) {
+    this._sendArray([{
+      m: 'a',
+      message: str
+    }])
+  }
+
+  /**
+   * Direct message a user
+   * @param {String} str
+   * @param {String} id
+   */
+  dm (str, id) {
+    this._sendArray([{
+      m: 'dm',
+      _id: id,
+      message: str
+    }])
+  }
+
+  /**
+   * Gives the crown to a specific user
+   * @param {String} id
+   */
+  giveCrown (id) {
+    this._sendArray([{
+      m: 'chown',
+      id: id
+    }])
+  }
+
+  /**
+     * Changes the current channel settings if owner/crown bearer
+     * @param {Object} settings
+     */
+  changeChannelSettings (settings) {
+    this._sendArray([{
+      m: 'chset',
+      set: settings
+    }])
+  }
+
+  /**
+     * Kicks/bans a user for a set amount of time between 0 and 3600000 ms. Only works if owner.
+     * @param {String} id
+     * @param {Int} ms
+     */
+  ban (id, ms) {
+    this._sendArray([{
+      m: 'kickban',
+      _id: id,
+      ms: ms
+    }])
+  }
+
+  /**
+     * Unbans a user
+     * @param {String} id
+     */
+  unBan (id) {
+    this._sendArray([{
+      m: 'unban',
+      _id: id
     }])
   }
 
@@ -261,6 +379,20 @@ class Client extends EventEmitter {
       x: x,
       y: y
     }
+  }
+
+  /**
+   * Sends notes to mpp
+   * @param {Int} time
+   * @param {Array<Obj>} notes
+   */
+  sendNotes (notes, time) {
+    console.log(this._serverOffset)
+    this._sendArray([{
+      m: 'n',
+      t: (time + this._serverOffset) || (+new Date() + this._serverOffset),
+      n: notes
+    }])
   }
 }
 
