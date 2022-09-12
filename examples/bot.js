@@ -23,7 +23,7 @@ mpp.on('dm', msg => {
 })
 
 mpp.on('notes', msg => {
-  //console.log(msg)
+  // console.log(msg)
 })
 
 // Example chat message event
@@ -67,8 +67,8 @@ mpp.on('message', msg => {
     if (args[0] === '!sendNotes') {
       mpp.sendNotes([
         {
-          "n":"c3",
-          "v":0.75
+          n: 'c3',
+          v: 0.75
         }
       ])
     }

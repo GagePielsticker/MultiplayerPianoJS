@@ -131,10 +131,10 @@ class Client extends EventEmitter {
         m: '+ls' // Subscribe to channel list updates
       }])
 
-      this._serverOffset = msg.t - (+new Date()) //set the offset
+      this._serverOffset = msg.t - (+new Date()) // set the offset
 
       this._setupHeartbeat()
-      
+
       this.emit('connected')
     }
 
