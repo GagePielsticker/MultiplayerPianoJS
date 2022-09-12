@@ -70,19 +70,13 @@ _Disconnects bot to the WS_
 
 _Sets the current channel_
 
-Returns: `x`
-
 - **setName(String name, String hexColor)**
 
 _Sets the current name & tag color_
 
-Returns: `x`
-
 - **moveMouse(Int x, Int y)**
 
 _Moves client mouse cursor_
-
-Returns: `x`
 
 ## Events
 - **connected**
