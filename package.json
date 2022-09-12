@@ -1,6 +1,6 @@
 {
   "name": "multiplayerpianojs",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "An easy to use NodeJS library for Multiplayerpiano.com otherwise known as MPP to create chat bots.",
   "main": "index.js",
   "repository": {
