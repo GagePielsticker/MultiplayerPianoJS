@@ -10,10 +10,50 @@
 
 `npm install multiplayerpianojs`
 
+### YOU MUST GET A TOKEN FROM MPPCLONE.COM OWNER!
+To get one on discord here https://discord.gg/338D2xMufC
+
 # Example Usage
 More seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
 ```js
+const MPPClient = require('multiplayerpianojs')
+const mpp = new MPPClient('Your Token')
 
+// const mpp = new MPPClient(token, SCOCKS/HTTPS PROXY HERE) alternatively
+mpp.connect()
+
+// On connect
+mpp.on('connected', () => {
+  console.log('bot connected')
+  mpp.setChannel('test3')
+})
+
+mpp.on('userLeave', user => {
+  console.log(`User left: ${user.name}`)
+})
+
+mpp.on('userJoin', user => {
+  console.log(`User joined: ${user.name}`)
+})
+
+// Example chat message event
+mpp.on('message', msg => {
+  const args = msg.content.split(' ')
+
+  if (msg.author._id === '1c7d9536250eb1f43652f4c0') {
+    if (args[0] === '!setname') {
+      mpp.setUser(args[1])
+    }
+
+    if (args[0] === '!joinroom') {
+      mpp.setChannel(args[1])
+    }
+
+    if (args[0] === '!move') {
+      mpp.moveMouse(args[1], args[2])
+    }
+  }
+})
 
 ```
 ## Methods/Functions
