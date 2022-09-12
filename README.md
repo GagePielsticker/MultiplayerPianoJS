@@ -176,6 +176,9 @@ _Current token_
 - socks-proxy-agent
 - ws
 
+## Planned Features
+You can see the planned features [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/TODO.md)
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
