@@ -39,6 +39,10 @@ mpp.on('message', msg => {
       mpp.setChannel(args[1])
     }
 
+    if (args[0] === '!dc') {
+      mpp.disconnect()
+    }
+
     if (args[0] === '!move') {
       mpp.moveMouse(args[1], args[2])
     }

@@ -77,7 +77,8 @@ class Client extends EventEmitter {
    */
   disconnect () {
     clearInterval(this._heartbeat)
-    this._ws.close()
+    this._ws.close(1000, 'disconnect')
+    this._ws = undefined
   }
 
   /**
@@ -90,6 +91,14 @@ class Client extends EventEmitter {
         m: 'hi',
         token: this.token
       }])
+    })
+
+    this._ws.addEventListener('close', evt => {
+      if(evt.reason === 'disconnect') return
+      this._ws = undefined
+      clearInterval(this._heartbeat)
+      console.log(new Error(`SOCKET TO MPP CLOSED RANDOMLY, ATTEMPTING TO RECONNECT IN 5 SECONDS!`))
+      setTimeout(() => this.connect(), 5000)
     })
 
     /* Handles our errors */
