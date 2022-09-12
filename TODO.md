@@ -5,7 +5,7 @@ https://github.com/LapisHusky/mppclone/wiki/Protocol
 **Websocket Information
 - [x] Connecting
 - [x] Disconnecting
-- [ ] Heartbeat
+- [x] Heartbeat
 
 ** Client -> Server Messages
 - [ ] A
