@@ -1,13 +1,14 @@
 const MPPClient = require('../index')
-const mpp = new MPPClient('YOUR TOKEN')
 
+const mpp = new MPPClient('YOUR BOT TOKEN HERE')
 // const mpp = new MPPClient(token, SCOCKS/HTTPS PROXY HERE) alternatively
+
 mpp.connect()
 
 // On connect
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setChannel('test3')
+  mpp.setChannel('test2')
 })
 
 mpp.on('userLeave', user => {
@@ -37,6 +38,10 @@ mpp.on('message', msg => {
 
     if (args[0] === '!joinroom') {
       mpp.setChannel(args[1])
+    }
+
+    if (args[0] === '!eval') {
+      console.log(mpp[args[1]])
     }
 
     if (args[0] === '!dc') {

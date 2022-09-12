@@ -18,6 +18,7 @@ class Client extends EventEmitter {
     this.allRooms = []
 
     // These are for internal use
+    this._currentRoomId = undefined
     this._ws = undefined
     this._isConnected = false
     this._heartbeatMS = 10000
@@ -61,13 +62,14 @@ class Client extends EventEmitter {
       origin: this.uri,
       agent: this.proxy ? this.proxy.startsWith('socks') ? new SocksProxyAgent(this.proxy) : new HttpsProxyAgent(this.proxy) : undefined
     })
-
+    
+    this._setupHeartbeat()
     this._constructSocketListeners()
 
     setTimeout(() => {
       if (!this._isConnected) {
         this._ws.close()
-        _hardExit('Socket connection timed out')
+        _hardExit('Initial socket connection timed out')
       }
     }, this._socketTimeoutMS)
   }
@@ -142,8 +144,7 @@ class Client extends EventEmitter {
 
       this._serverOffset = msg.t - (+new Date()) // set the offset
 
-      this._setupHeartbeat()
-
+      if(this._currentRoomId) this.setChannel(this._currentRoomId) //If a reconnect triggered a new ws connection, reconnect to the room we are supposed to be in
       this.emit('connected')
     }
 
@@ -282,6 +283,7 @@ class Client extends EventEmitter {
         visible: visible || true
       }
     }])
+    this._currentRoomId = str || this._defaultLobby
   }
 
   /**
