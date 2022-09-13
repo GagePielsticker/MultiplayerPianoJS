@@ -1,6 +1,6 @@
 const MPPClient = require('../index')
 
-const mpp = new MPPClient('YOUR BOT TOKEN HERE')
+const mpp = new MPPClient('YOUR TOKEN HERE')
 // const mpp = new MPPClient(token, SCOCKS/HTTPS PROXY HERE) alternatively
 
 mpp.connect()
@@ -8,7 +8,7 @@ mpp.connect()
 // On connect
 mpp.on('connected', () => {
   console.log('bot connected')
-  mpp.setChannel('test2')
+  mpp.setChannel('test')
 })
 
 mpp.on('userLeave', user => {

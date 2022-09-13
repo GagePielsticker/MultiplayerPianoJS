@@ -15,6 +15,7 @@ class Client extends EventEmitter {
 
     this.user = {}
     this.room = {}
+    this.hasCrown = false;
     this.allRooms = []
 
     // These are for internal use
@@ -174,6 +175,9 @@ class Client extends EventEmitter {
           this.user.mouse.y = parseFloat(e.y)
         }
       })
+
+      if(msg.ch.crown.userId === this.user.id) this.hasCrown = true
+      else this.hasCrown = false
 
       this.room = {
         settings: msg.ch.settings,
@@ -341,7 +345,7 @@ class Client extends EventEmitter {
     this._sendArray([{
       m: 'kickban',
       _id: id,
-      ms: ms
+      ms: ms || 1
     }])
   }
 

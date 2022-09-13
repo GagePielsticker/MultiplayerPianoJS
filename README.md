@@ -157,6 +157,10 @@ _Fired when user sends notes_
 
 _Currently used proxy_
 
+- **hasCrown**
+
+_If the bot has the crown (room ownership)_
+
 - **user**
 
 _Current user object_
