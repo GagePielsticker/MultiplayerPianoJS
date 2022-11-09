@@ -8,7 +8,7 @@ class Client extends EventEmitter {
     super()
 
     // These are available to the client
-    this.uri = 'wss://www.mppclone.com'
+    this.uri = 'wss://mppclone.com'
     this.proxy = proxy
 
     this.token = token
