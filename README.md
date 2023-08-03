@@ -1,6 +1,8 @@
 ![Logo](https://i.imgur.com/tEXHZfc.png)
 #
 
+## THIS IS NO LONGER MAINTAINED!
+
 ## Foreword
 
 > Wrote this to help developers create bots for https://multiplayerpiano.com/ / https://mppclone.com/ simple and more streamlined. The current method of all devs manually interacting with the websocket seemed a bit inefficient and non-beginner friendly. Enter MultiplayerPianoJS!
