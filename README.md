@@ -1,7 +1,7 @@
 ![Logo](https://i.imgur.com/tEXHZfc.png)
 #
 
-## THIS IS NO LONGER MAINTAINED!
+## THIS IS NO LONGER MAINTAINED AND IS NOW ARCHIVED!
 
 ## Foreword
 
