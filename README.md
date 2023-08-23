@@ -12,9 +12,6 @@
 
 `npm install multiplayerpianojs`
 
-### YOU MUST GET A TOKEN FROM MPPCLONE.COM OWNER!
-To get one, join the discord https://discord.gg/338D2xMufC . Using this without a token will result in a 24 hour ban so be careful!
-
 # Example Usage
 Bigger example seen [here](https://github.com/GagePielsticker/MultiplayerPianoJS/blob/master/examples/)
 
